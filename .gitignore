@@ -1,0 +1,29 @@
+# Build outputs
+dist/
+*.deb
+thermal-camera-viewer_*_amd64/
+thermal-camera-viewer_*_amd64.deb
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+.venv/
+venv/
+.python-version
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/
+
+# Test / type / coverage
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
