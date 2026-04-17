@@ -1,6 +1,6 @@
 # Thermal Camera Viewer
 
-A desktop application and virtual webcam driver for USB thermal cameras based on the P3/P1 chipset (Vendor ID `0x3474`).
+A desktop application and virtual webcam driver for USB thermal cameras based on the Thermal Master P3/P1 (Vendor ID `0x3474`).
 
 Built on top of [jvdillon/p3-ir-camera](https://github.com/jvdillon/p3-ir-camera) — the original open-source Python driver and protocol documentation for P3-series thermal cameras. This project extends it with a full Qt GUI, installable packages for Linux and macOS, **native Windows viewer support** (same PyUSB stack as upstream), and a plug-and-play UVC virtual webcam driver (**Linux only**).
 
