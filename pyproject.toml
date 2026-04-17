@@ -5,11 +5,22 @@ description = "Thermal Camera Viewer — USB thermal camera viewer & UVC virtual
 readme = "README.md"
 license = "Apache-2.0"
 requires-python = ">=3.10"
+classifiers = [
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: Microsoft :: Windows",
+    "License :: OSI Approved :: Apache Software License",
+]
 dependencies = [
     "numpy>=1.24",
     "opencv-python-headless>=4.8",
     "pyusb>=1.2",
     "PyQt5>=5.15",
+]
+
+[project.optional-dependencies]
+windows = [
+    "libusb-package>=1.0.26",
 ]
 
 [project.urls]

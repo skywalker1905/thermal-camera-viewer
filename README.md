@@ -2,7 +2,7 @@
 
 A desktop application and virtual webcam driver for USB thermal cameras based on the P3/P1 chipset (Vendor ID `0x3474`).
 
-Built on top of [jvdillon/p3-ir-camera](https://github.com/jvdillon/p3-ir-camera) — the original open-source Python driver and protocol documentation for P3-series thermal cameras. This project extends it with a full Qt GUI, installable packages for Linux and macOS, and a plug-and-play UVC virtual webcam driver.
+Built on top of [jvdillon/p3-ir-camera](https://github.com/jvdillon/p3-ir-camera) — the original open-source Python driver and protocol documentation for P3-series thermal cameras. This project extends it with a full Qt GUI, installable packages for Linux and macOS, **native Windows viewer support** (same PyUSB stack as upstream), and a plug-and-play UVC virtual webcam driver (**Linux only**).
 
 ![Thermal Camera Viewer](screenshots/viewer.png)
 
@@ -17,7 +17,7 @@ These are commonly sold as "Thermal Master P3", "InfiRay P2 Pro", and similar US
 
 ## Features
 
-### Viewer Application (Linux & macOS)
+### Viewer Application (Linux, macOS & Windows)
 
 - **Real-time thermal display** at 25 fps with mouse-over temperature readout
 - **Region of Interest (ROI)** — drag a box to see max/min/average temperature within the region, with small markers tracking the hottest and coldest points
@@ -103,7 +103,42 @@ rm -rf "/Applications/Thermal Camera Viewer.app"
 rm -f /usr/local/bin/thermal-camera-viewer
 ```
 
-> **Note**: The UVC virtual webcam feature is Linux-only (requires the `v4l2loopback` kernel module). On macOS, only the viewer application is available.
+> **Note**: The UVC virtual webcam feature is Linux-only (requires the `v4l2loopback` kernel module). On macOS and Windows, only the viewer application is available.
+
+### Windows
+
+#### Prerequisites
+
+- Windows 10 or 11 (64-bit)
+- [Python 3.10+](https://www.python.org/downloads/) on `PATH` (or `winget install Python.Python.3.12`)
+- [FFmpeg](https://ffmpeg.org/download.html) on `PATH` if you want **F5 MP4 recording** (optional)
+- **USB driver for PyUSB** (same as [upstream p3-ir-camera](https://github.com/jvdillon/p3-ir-camera#usb-driver-windows)): install **WinUSB** for the camera with [Zadig](https://zadig.akeo.ie/) (Options → List All Devices → device with **VID 3474** / PID **45A2** (P3) or **45C2** (P1) → WinUSB → Replace Driver).
+
+#### Install (PowerShell)
+
+From a clone of this repository:
+
+```powershell
+cd thermal-camera-viewer
+Set-ExecutionPolicy -Scope CurrentUser RemoteSigned -Force   # if scripts are blocked
+.\install-windows.ps1
+.\.venv\Scripts\python.exe -m thermal_camera_viewer
+```
+
+The script creates a project-local `.venv` and installs `PyQt5`, `numpy`, `opencv-python-headless`, `pyusb`, and **`libusb-package`** (ships `libusb-1.0` DLLs used by PyUSB on Windows).
+
+#### Portable / manual pip
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\pip install -U pip
+.\.venv\Scripts\pip install libusb-package numpy opencv-python-headless pyusb PyQt5
+.\.venv\Scripts\python.exe -m thermal_camera_viewer
+```
+
+#### Uninstall (Windows)
+
+Delete the project folder (and `.venv`). Remove the WinUSB driver in Device Manager if you need the original OEM driver back.
 
 ## Usage
 
@@ -117,12 +152,16 @@ thermal-camera-viewer
 
 On macOS, open "Thermal Camera Viewer" from the Applications folder or Launchpad.
 
+On Windows, run `python -m thermal_camera_viewer` from the activated `.venv` (see above), or use `py -3.12 -m thermal_camera_viewer` if you installed dependencies globally.
+
+Screenshots and recordings go to **Pictures** and **Videos** under your user profile (`%USERPROFILE%`).
+
 #### Keyboard Shortcuts
 
 | Key | Action |
 |-----|--------|
-| `Space` | Screenshot (saved to `~/Pictures`) |
-| `F5` | Start / stop recording (saved to `~/Videos`) |
+| `Space` | Screenshot (saved to `~/Pictures` on Linux/macOS, `%USERPROFILE%\Pictures` on Windows) |
+| `F5` | Start / stop recording (saved to `~/Videos` or `%USERPROFILE%\Videos`; requires `ffmpeg` on `PATH`) |
 | `R` | Rotate 90° clockwise |
 | `Shift+R` | Rotate 90° counter-clockwise |
 | `M` | Flip horizontal (mirror) |
@@ -166,6 +205,8 @@ For Zoom / Google Meet: select "ThermalCamera" from the camera dropdown.
 When you open the viewer app, it temporarily takes over the camera from the UVC driver. When you close the viewer, the UVC driver automatically resumes within 2 seconds.
 
 ## Architecture
+
+The Qt viewer (`viewer.py`) runs on **Linux, macOS, and Windows** (PyUSB + libusb). The **virtual webcam** path (`uvc_driver.py` → v4l2loopback) is **Linux-only**.
 
 ### System Components
 
@@ -311,7 +352,8 @@ thermal-camera-viewer/
 │   └── thermal-camera-viewer-*.png
 ├── build-deb.sh                 # Linux .deb package builder
 ├── build-macos.sh               # macOS .app bundle builder
-├── install.sh                   # Cross-platform installer
+├── install.sh                   # Linux / macOS installer
+├── install-windows.ps1          # Windows: venv + pip dependencies
 ├── pyproject.toml               # Python project metadata
 ├── .gitignore
 ├── LICENSE
@@ -342,6 +384,15 @@ pip3 install pyqt5 numpy opencv-python-headless pyusb
 python3 -m thermal_camera_viewer
 ```
 
+#### Windows
+
+```powershell
+# After .\install-windows.ps1 (or equivalent pip install into .venv)
+.\.venv\Scripts\python.exe -m thermal_camera_viewer
+```
+
+Use **Zadig + WinUSB** for the camera before first run; see [p3-ir-camera — USB driver (Windows)](https://github.com/jvdillon/p3-ir-camera#usb-driver-windows).
+
 ### Building
 
 ```bash
@@ -351,6 +402,8 @@ bash build-deb.sh
 # macOS
 bash build-macos.sh
 ```
+
+There is no bundled `.exe` installer yet; on Windows use `install-windows.ps1` or `pip install -e ".[windows]"` from a checkout.
 
 ## Acknowledgments
 

@@ -904,9 +904,16 @@ class MainWindow(QMainWindow):
 
     @staticmethod
     def _xdg_dir(xdg_var: str, fallback: str) -> str:
-        d = os.environ.get(xdg_var, "")
-        if not d:
-            d = os.path.join(os.path.expanduser("~"), fallback)
+        if sys.platform == "win32":
+            base = os.environ.get("USERPROFILE", os.path.expanduser("~"))
+            if "PICTURE" in xdg_var.upper():
+                d = os.path.join(base, "Pictures")
+            else:
+                d = os.path.join(base, "Videos")
+        else:
+            d = os.environ.get(xdg_var, "")
+            if not d:
+                d = os.path.join(os.path.expanduser("~"), fallback)
         os.makedirs(d, exist_ok=True)
         return d
 
@@ -1135,6 +1142,8 @@ def _stop_uvc_driver() -> None:
     Does NOT touch the watcher — the watcher keeps v4l2loopback alive and
     will automatically restart the UVC driver once the viewer exits.
     """
+    if sys.platform == "win32":
+        return
     import subprocess
     pid = os.getpid()
     for pat in (
@@ -1163,17 +1172,20 @@ def main() -> None:
     # The watcher stays alive and will re-spawn the driver after we exit.
     _stop_uvc_driver()
 
-    # Also kill stale viewer instances
-    pid = os.getpid()
-    try:
-        out = subprocess.check_output(["pgrep", "-f", "thermal_camera_viewer.viewer"], text=True)
-        for line in out.strip().split("\n"):
-            p = int(line.strip())
-            if p != pid:
-                os.kill(p, signal.SIGTERM)
-    except Exception:
-        pass
-    time.sleep(0.4)
+    # Also kill stale viewer instances (Linux/macOS: pgrep; not used on Windows)
+    if sys.platform != "win32":
+        pid = os.getpid()
+        try:
+            out = subprocess.check_output(
+                ["pgrep", "-f", "thermal_camera_viewer.viewer"], text=True
+            )
+            for line in out.strip().split("\n"):
+                p = int(line.strip())
+                if p != pid:
+                    os.kill(p, signal.SIGTERM)
+        except Exception:
+            pass
+        time.sleep(0.4)
 
     app = QApplication(sys.argv)
     app.setApplicationName("Thermal Camera Viewer")

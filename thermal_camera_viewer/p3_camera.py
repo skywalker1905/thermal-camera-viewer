@@ -26,6 +26,7 @@ import contextlib
 import dataclasses
 import logging
 import struct
+import sys
 import time
 
 import numpy as np
@@ -1051,8 +1052,10 @@ class P3Camera:
         return "".join(result).strip()
 
     def _detach_kernel_drivers(self) -> None:
-        """Detach kernel drivers from USB interfaces."""
+        """Detach kernel drivers from USB interfaces (Linux only; no-op on Windows/macOS)."""
         if self.dev is None:
+            return
+        if sys.platform == "win32":
             return
         for cfg in self.dev:
             for intf in cfg:

@@ -9,7 +9,7 @@ and licensed under the Apache License, Version 2.0.
 The USB driver and protocol implementation in
 thermal_camera_viewer/p3_camera.py continues that work.
 
-Additional components in this repository (Qt viewer, Debian/macOS
+Additional components in this repository (Qt viewer, Debian/macOS/Windows
 packaging, Linux UVC virtual webcam driver, and related scripts) are
 contributed under the Apache License, Version 2.0, unless otherwise
 stated in individual files.

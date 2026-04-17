@@ -17,12 +17,17 @@ Power-saving design:
 
 from __future__ import annotations
 
-import fcntl
 import glob
 import os
 import signal
 import struct
+import sys
 import time
+
+try:
+    import fcntl
+except ImportError:  # Windows
+    fcntl = None  # type: ignore[misc, assignment]
 
 import cv2
 import numpy as np
@@ -90,6 +95,8 @@ class V4L2Writer:
         self._open()
 
     def _open(self):
+        if fcntl is None:
+            raise RuntimeError("v4l2loopback writer requires Linux (fcntl.ioctl)")
         self.fd = os.open(self.device, os.O_RDWR)
         off = _FMT_UNION_OFF
         buf = bytearray(V4L2_FMT_SIZE)
@@ -212,6 +219,8 @@ def run_uvc(
     out_w: int = 640,
     out_h: int = 480,
 ) -> None:
+    if sys.platform == "win32" or fcntl is None:
+        raise RuntimeError("UVC virtual webcam requires Linux (v4l2loopback + fcntl).")
     cmap_map = {n.lower(): v for n, v in ColormapID.__members__.items()}
     cmap_id = cmap_map.get(colormap.lower(), ColormapID.RAINBOW)
 
@@ -347,6 +356,13 @@ def run_uvc(
 
 
 def main():
+    if sys.platform == "win32":
+        print(
+            "thermal-camera-viewer-uvc: virtual webcam is Linux-only (v4l2loopback).\n"
+            "On Windows, use the desktop viewer:  python -m thermal_camera_viewer",
+            file=sys.stderr,
+        )
+        raise SystemExit(2)
     import argparse
     parser = argparse.ArgumentParser(
         description="Stream thermal camera as a virtual webcam (UVC)",
