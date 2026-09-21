@@ -3,6 +3,6 @@
 SPDX-License-Identifier: Apache-2.0
 """
 
-from .viewer import main
+from thermal_camera_viewer.viewer import main
 
 main()

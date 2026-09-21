@@ -125,7 +125,7 @@ Set-ExecutionPolicy -Scope CurrentUser RemoteSigned -Force   # if scripts are bl
 .\.venv\Scripts\python.exe -m thermal_camera_viewer
 ```
 
-The script checks for Python 3.10+, creates a project-local `.venv`, and installs this package in editable mode with its dependencies: `PyQt5`, `numpy`, `opencv-python-headless`, `pyusb`, and **`libusb-package`** (ships `libusb-1.0` DLLs used by PyUSB on Windows). It stops with an error if any step fails.
+The script checks for Python 3.10+, creates a project-local `.venv`, and installs this package in editable mode with its dependencies: `PyQt5`, `numpy`, `opencv-python-headless`, `pyusb`, `pyinstaller`, and **`libusb-package`** (ships `libusb-1.0` DLLs used by PyUSB on Windows). It stops with an error if any step fails.
 
 #### Portable / manual pip
 
