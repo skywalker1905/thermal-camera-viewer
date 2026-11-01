@@ -80,7 +80,7 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host ""
 Write-Host "=== Setup Reminders: ===" -ForegroundColor Cyan
 Write-Host "USB (required once): Zadig -> Options -> List All Devices ->"
-Write-Host "  select camera (VID 3474, PID 45A2 or 45C2) -> WinUSB driver."
+Write-Host "  select camera (VID 3474, PID 45A2 or 45C2 or 42B2) -> WinUSB driver."
 Write-Host "  See: https://github.com/jvdillon/p3-ir-camera#usb-driver-windows"
 Write-Host ""
 Write-Host "Optional: add FFmpeg to PATH for MP4 recording (F5)."

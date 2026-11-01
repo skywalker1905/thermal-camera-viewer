@@ -177,7 +177,7 @@ def _has_readers(dev_path: str, own_fd: int) -> bool:
     return False
 
 
-def _usb_camera_present(vid: str = "3474", pid: str = "45a2") -> bool:
+def _usb_camera_present(vid: str = "3474") -> bool:
     """Check if the physical USB camera is still connected."""
     try:
         for d in os.listdir("/sys/bus/usb/devices"):
@@ -187,7 +187,11 @@ def _usb_camera_present(vid: str = "3474", pid: str = "45a2") -> bool:
                     if f.read().strip() != vid:
                         continue
                 with open(f"{base}/idProduct") as f:
-                    if f.read().strip() in (pid, "45c2"):
+                    if f.read().strip() in "45a2":
+                        return True
+                    elif f.read().strip() in "45c2":
+                        return True
+                    elif f.read().strip() in "42b2":
                         return True
             except OSError:
                 continue
@@ -374,7 +378,7 @@ def main():
             "  thermal-camera-viewer-uvc --colormap ironbow\n"
         ),
     )
-    parser.add_argument("--model", choices=["p1", "p3"], default="p3")
+    parser.add_argument("--model", choices=["p1", "p3", "p3l"], default="p3")
     parser.add_argument("--device", type=str, default=None,
                         help="v4l2loopback device (e.g. /dev/video10)")
     parser.add_argument("--colormap", type=str, default="rainbow",
