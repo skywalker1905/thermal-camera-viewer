@@ -10,6 +10,7 @@ Built on top of [jvdillon/p3-ir-camera](https://github.com/jvdillon/p3-ir-camera
 
 | Model | PID | Resolution | Frame Rate |
 |-------|-----|-----------|------------|
+| P3 Lite | `0x42B2` | 256 × 192 | 25 fps |
 | P3 | `0x45A2` | 256 × 192 | 25 fps |
 | P1 | `0x45C2` | 160 × 120 | 25 fps |
 
@@ -112,7 +113,7 @@ rm -f /usr/local/bin/thermal-camera-viewer
 - Windows 10 or 11 (64-bit)
 - [Python 3.10+](https://www.python.org/downloads/) on `PATH` (or `winget install Python.Python.3.12`)
 - [FFmpeg](https://ffmpeg.org/download.html) on `PATH` if you want **F5 MP4 recording** (optional)
-- **USB driver for PyUSB** (same as [upstream p3-ir-camera](https://github.com/jvdillon/p3-ir-camera#usb-driver-windows)): install **WinUSB** for the camera with [Zadig](https://zadig.akeo.ie/) (Options → List All Devices → device with **VID 3474** / PID **45A2** (P3) or **45C2** (P1) → WinUSB → Replace Driver).
+- **USB driver for PyUSB** (same as [upstream p3-ir-camera](https://github.com/jvdillon/p3-ir-camera#usb-driver-windows)): install **WinUSB** for the camera with [Zadig](https://zadig.akeo.ie/) (Options → List All Devices → device with **VID 3474** / PID **45A2** (P3) or **45C2** (P1) or **42B2** (P3 Lite) → WinUSB → Replace Driver).
 
 #### Install (PowerShell)
 
@@ -215,7 +216,7 @@ Run the steps below in order. The first one that fails is your problem.
 #### 1. Is the camera detected by USB?
 
 ```bash
-lsusb -d 3474:        # P3 = 3474:45a2, P1 = 3474:45c2
+lsusb -d 3474:        # P3 = 3474:45a2, P1 = 3474:45c2, P3 Lite = 3474:42B2
 ```
 
 Expect a line for your model. If empty, it's a USB / cable / hub issue.
@@ -262,7 +263,7 @@ sudo mokutil --import /var/lib/dkms/mok.pub
 
 ```bash
 sudo udevadm monitor --udev --subsystem-match=usb
-# unplug and replug the camera; you should see ATTR{idProduct}=="45a2" or "45c2"
+# unplug and replug the camera; you should see ATTR{idProduct}=="45a2" or "45c2" or "42b2"
 # Ctrl-C when done
 ```
 

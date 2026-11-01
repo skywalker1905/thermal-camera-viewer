@@ -1172,7 +1172,7 @@ def main() -> None:
     import subprocess
 
     parser = argparse.ArgumentParser(description="Thermal Camera Viewer")
-    parser.add_argument("--model", choices=["p1", "p3"], default="p3")
+    parser.add_argument("--model", choices=["p1", "p3", "p3l"], default="p3")
     args = parser.parse_args()
 
     # Kill only the UVC driver so the viewer can claim the camera.

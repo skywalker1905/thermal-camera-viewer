@@ -5,6 +5,7 @@ P3-series USB thermal cameras.
 
 Supports:
 - P3: VID=0x3474, PID=0x45A2, 256×192 resolution
+- P3 Lite: VID=0x3474, PID=0x42B2, 256×192 resolution
 - P1: VID=0x3474, PID=0x45C2, 160×120 resolution
 
 Protocol details based on USB traffic analysis by @aeternium.
@@ -85,8 +86,9 @@ CNT3_WRAP = 2048
 class Model(str, Enum):
     """Camera model."""
 
-    P1 = "p1"  # 160×120 resolution, PID=0x45C2
-    P3 = "p3"  # 256×192 resolution, PID=0x45A2
+    P1  = "p1"   # 160×120 resolution, PID=0x45C2
+    P3  = "p3"   # 256×192 resolution, PID=0x45A2
+    P3L = "p3l"  # 256×192 resolution, PID=0x42B2
 
 
 @dataclasses.dataclass(kw_only=True, frozen=True, slots=True)
@@ -150,7 +152,7 @@ def get_model_config(model: Model | str = Model.P3) -> ModelConfig:
     """Get configuration for a camera model.
 
     Args:
-        model: Camera model (P1 or P3).
+        model: Camera model (P1 or P3 or P3L).
 
     Returns:
         Model configuration.
@@ -165,10 +167,19 @@ def get_model_config(model: Model | str = Model.P3) -> ModelConfig:
             shutter_seg_1_lines=36,
             shutter_seg_2_lines=800
         )
-    else:  # P3
+    if model == Model.P3:
         return ModelConfig(
             model=Model.P3,
             pid=0x45A2,
+            sensor_w=256,
+            sensor_h=192,  # 192 IR + 2 metadata + 192 thermal = 386 rows
+            shutter_seg_1_lines=36,
+            shutter_seg_2_lines=800
+        )
+    if model == Model.P3L:
+        return ModelConfig(
+            model=Model.P3L,
+            pid=0x42B2,
             sensor_w=256,
             sensor_h=192,  # 192 IR + 2 metadata + 192 thermal = 386 rows
             shutter_seg_1_lines=36,

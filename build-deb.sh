@@ -83,7 +83,7 @@ cat > "${PKG_DIR}/usr/bin/${APP_NAME}-uvc-watch" << 'WATCHER'
 # Runs UVC driver in BACKGROUND, polls camera presence every 2s.
 # On camera removal: kills driver, unloads v4l2loopback, exits.
 USB_VID="3474"
-USB_PID="45[ac]2"  # matches P1 (45c2) and P3 (45a2)
+USB_PID="4[52][abc]2"  # matches P1 (45c2) and P3 (45a2) and P3 Lite (42b2)
 UVC_PID=""
 
 camera_present() {
@@ -152,6 +152,7 @@ cat > "${PKG_DIR}/etc/udev/rules.d/99-thermal-camera-viewer.rules" << 'UDEV'
 # USB thermal camera — permissions + hotplug
 ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="3474", ATTR{idProduct}=="45a2", MODE="0666", RUN+="/opt/thermal-camera-viewer/hotplug-add.sh"
 ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="3474", ATTR{idProduct}=="45c2", MODE="0666", RUN+="/opt/thermal-camera-viewer/hotplug-add.sh"
+ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="3474", ATTR{idProduct}=="42b2", MODE="0666", RUN+="/opt/thermal-camera-viewer/hotplug-add.sh"
 # v4l2loopback virtual camera — permissions when device appears
 KERNEL=="video10", SUBSYSTEM=="video4linux", MODE="0666"
 UDEV
@@ -245,7 +246,7 @@ update-desktop-database /usr/share/applications 2>/dev/null || true
 gtk-update-icon-cache -f /usr/share/icons/hicolor 2>/dev/null || true
 
 # Only load v4l2loopback if the camera is currently plugged in
-if lsusb -d 3474:45a2 >/dev/null 2>&1 || lsusb -d 3474:45c2 >/dev/null 2>&1; then
+if lsusb -d 3474:45a2 >/dev/null 2>&1 || lsusb -d 3474:45c2 >/dev/null 2>&1 || lsusb -d 3474:42b2 >/dev/null 2>&1; then
     modprobe -r v4l2loopback 2>/dev/null || true
     modprobe v4l2loopback devices=1 video_nr=10 card_label=ThermalCamera exclusive_caps=1 2>/dev/null || true
     sleep 0.5
